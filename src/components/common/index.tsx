@@ -133,6 +133,13 @@ export function Input({
   const { colors } = useTheme();
   const styles = getStyles(colors);
   const [focused, setFocused] = useState(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setIsPasswordVisible(!isPasswordVisible);
+  };
+
+  const isSecure = secureTextEntry && !isPasswordVisible;
 
   return (
     <View style={[styles.inputContainer, containerStyle]}>
@@ -149,7 +156,7 @@ export function Input({
           onChangeText={onChangeText}
           placeholder={placeholder}
           placeholderTextColor={colors.textMuted}
-          secureTextEntry={secureTextEntry}
+          secureTextEntry={isSecure}
           keyboardType={keyboardType}
           autoCapitalize={autoCapitalize}
           multiline={multiline}
@@ -158,6 +165,18 @@ export function Input({
           onBlur={() => setFocused(false)}
           style={[styles.input, style]}
         />
+        {secureTextEntry && (
+          <TouchableOpacity
+            onPress={togglePasswordVisibility}
+            style={styles.eyeIcon}
+          >
+            <Ionicons
+              name={isPasswordVisible ? "eye-off-outline" : "eye-outline"}
+              size={20}
+              color={colors.textSecondary}
+            />
+          </TouchableOpacity>
+        )}
       </View>
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
     </View>
@@ -276,6 +295,11 @@ const getStyles = (colors: any) =>
       paddingVertical: 14,
       color: colors.textPrimary,
       fontSize: typography.base,
+    },
+    eyeIcon: {
+      paddingHorizontal: spacing.base,
+      justifyContent: "center",
+      alignItems: "center",
     },
     errorText: {
       color: colors.error,

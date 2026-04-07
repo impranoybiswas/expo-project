@@ -51,8 +51,9 @@ export function LoginScreen({ navigation }: any) {
 
       <SafeAreaView style={styles.safe}>
         <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={{ flex: 1 }}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
         >
           <ScrollView
             contentContainerStyle={styles.scroll}
@@ -80,8 +81,7 @@ export function LoginScreen({ navigation }: any) {
               style={styles.cardContainer}
             >
               <BlurView intensity={20} tint="dark" style={styles.card}>
-                <Text style={styles.cardTitle}>Welcome back 👋</Text>
-                <Text style={styles.cardSubtitle}>Login to continue</Text>
+                <Text style={styles.cardTitle}>Login</Text>
 
                 <Input
                   label="Email"
@@ -178,6 +178,7 @@ const styles = StyleSheet.create({
     fontSize: typography["2xl"],
     fontWeight: "800",
     color: colors.textPrimary,
+    textAlign: "center",
   },
   cardSubtitle: {
     color: colors.textSecondary,

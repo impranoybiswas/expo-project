@@ -28,7 +28,10 @@ export function useTasks() {
 
   // ── Realtime subscription ────────────────────────────────────
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setTasks([]); // <--- Add this to clear the list on logout
+      return;
+    }
     setLoading(true);
 
     const unsub = subscribeToTasks(

@@ -56,8 +56,9 @@ export function RegisterScreen({ navigation }: any) {
 
       <SafeAreaView style={styles.safe}>
         <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={{ flex: 1 }}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
         >
           <ScrollView
             contentContainerStyle={styles.scroll}
@@ -85,7 +86,7 @@ export function RegisterScreen({ navigation }: any) {
               style={styles.cardContainer}
             >
               <BlurView intensity={20} tint="dark" style={styles.card}>
-                <Text style={styles.cardTitle}>Create Account 🚀</Text>
+                <Text style={styles.cardTitle}>Create Account</Text>
 
                 <Input
                   label="Name"
@@ -188,6 +189,7 @@ const styles = StyleSheet.create({
     fontSize: typography.xl,
     fontWeight: "800",
     color: colors.textPrimary,
+    textAlign: "center",
   },
   error: {
     color: colors.error,
