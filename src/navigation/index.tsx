@@ -6,7 +6,8 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 
 import { useAuthStore } from "../store";
-import { colors, radius } from "../theme";
+import { useTheme } from "../hooks/useTheme";
+import { radius } from "../theme";
 
 // Screens
 import { LoginScreen } from "../screens/auth/LoginScreen";
@@ -46,14 +47,16 @@ function TaskNavigator() {
 
 // ─── Bottom Tab Navigator ─────────────────────────────────────
 function MainNavigator() {
+  const { colors, isDark } = useTheme();
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarHideOnKeyboard: true,
         tabBarStyle: {
-          backgroundColor: "rgba(12, 12, 26, 0.95)",
-          borderTopColor: "rgba(255, 255, 255, 0.08)",
+          backgroundColor: colors.tabBar,
+          borderTopColor: colors.border,
           borderTopWidth: 1,
           paddingBottom: 8,
           paddingTop: 8,

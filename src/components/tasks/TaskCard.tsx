@@ -3,7 +3,8 @@ import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Animated, { FadeInRight, Layout } from "react-native-reanimated";
 import { BlurView } from "expo-blur";
-import { colors, typography, spacing, radius } from "../../theme";
+import { useTheme } from "../../hooks/useTheme";
+import { typography, spacing, radius, priorityColors } from "../../theme";
 import { Badge } from "../common";
 import type { Task } from "../../types";
 
@@ -16,22 +17,6 @@ interface TaskCardProps {
   index?: number;
 }
 
-const PRIORITY_CONFIG = {
-  low: { color: colors.priorityLow, label: "Low" },
-  medium: { color: colors.priorityMedium, label: "Medium" },
-  high: { color: colors.priorityHigh, label: "High" },
-};
-
-const STATUS_CONFIG = {
-  todo: { color: colors.textMuted, label: "To Do", icon: "ellipse-outline" },
-  "in-progress": {
-    color: colors.warning,
-    label: "In Progress",
-    icon: "time-outline",
-  },
-  done: { color: colors.success, label: "Done", icon: "checkmark-circle" },
-};
-
 export function TaskCard({
   task,
   onPress,
@@ -40,6 +25,25 @@ export function TaskCard({
   onToggleStatus,
   index = 0,
 }: TaskCardProps) {
+  const { colors, isDark } = useTheme();
+  const styles = getStyles(colors);
+
+  const PRIORITY_CONFIG = {
+    low: { color: priorityColors.low, label: "Low" },
+    medium: { color: priorityColors.medium, label: "Medium" },
+    high: { color: priorityColors.high, label: "High" },
+  };
+
+  const STATUS_CONFIG = {
+    todo: { color: colors.textMuted, label: "To Do", icon: "ellipse-outline" },
+    "in-progress": {
+      color: colors.warning,
+      label: "In Progress",
+      icon: "time-outline",
+    },
+    done: { color: colors.success, label: "Done", icon: "checkmark-circle" },
+  };
+
   const priority = PRIORITY_CONFIG[task.priority];
   const status = STATUS_CONFIG[task.status];
   const isDone = task.status === "done";
@@ -61,7 +65,11 @@ export function TaskCard({
         activeOpacity={0.7}
         style={styles.container}
       >
-        <BlurView intensity={15} tint="dark" style={styles.blurContainer}>
+        <BlurView
+          intensity={15}
+          tint={isDark ? "dark" : "light"}
+          style={styles.blurContainer}
+        >
           {/* Left accent bar */}
           <View style={[styles.accent, { backgroundColor: priority.color }]} />
 
@@ -149,81 +157,82 @@ export function TaskCard({
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    marginBottom: spacing.md,
-    borderRadius: radius.xl,
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: colors.bgGlassBorder,
-  },
-  blurContainer: {
-    flexDirection: "row",
-    backgroundColor: colors.bgGlass,
-  },
-  accent: {
-    width: 4,
-    borderTopLeftRadius: radius.xl,
-    borderBottomLeftRadius: radius.xl,
-  },
-  content: {
-    flex: 1,
-    padding: spacing.base,
-    gap: 8,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: spacing.sm,
-  },
-  statusBtn: {
-    marginTop: 1,
-  },
-  titleBlock: { flex: 1 },
-  title: {
-    color: colors.textPrimary,
-    fontSize: typography.base,
-    fontWeight: "600",
-    lineHeight: 20,
-  },
-  titleDone: {
-    textDecorationLine: "line-through",
-    color: colors.textMuted,
-  },
-  category: {
-    color: colors.accent,
-    fontSize: typography.xs,
-    marginTop: 2,
-    fontWeight: "500",
-  },
-  actions: {
-    flexDirection: "row",
-    gap: 4,
-  },
-  actionBtn: {
-    padding: 6,
-    borderRadius: radius.sm,
-    backgroundColor: colors.bgElevated,
-  },
-  description: {
-    color: colors.textSecondary,
-    fontSize: typography.sm,
-    lineHeight: 18,
-    paddingLeft: 30,
-  },
-  footer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 6,
-    paddingLeft: 30,
-  },
-  dueDate: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 3,
-  },
-  dueDateText: {
-    color: colors.textMuted,
-    fontSize: typography.xs,
-  },
-});
+const getStyles = (colors: any) =>
+  StyleSheet.create({
+    container: {
+      marginBottom: spacing.md,
+      borderRadius: radius.xl,
+      overflow: "hidden",
+      borderWidth: 1,
+      borderColor: colors.bgGlassBorder,
+    },
+    blurContainer: {
+      flexDirection: "row",
+      backgroundColor: colors.bgGlass,
+    },
+    accent: {
+      width: 4,
+      borderTopLeftRadius: radius.xl,
+      borderBottomLeftRadius: radius.xl,
+    },
+    content: {
+      flex: 1,
+      padding: spacing.base,
+      gap: 8,
+    },
+    header: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      gap: spacing.sm,
+    },
+    statusBtn: {
+      marginTop: 1,
+    },
+    titleBlock: { flex: 1 },
+    title: {
+      color: colors.textPrimary,
+      fontSize: typography.base,
+      fontWeight: "600",
+      lineHeight: 20,
+    },
+    titleDone: {
+      textDecorationLine: "line-through",
+      color: colors.textMuted,
+    },
+    category: {
+      color: colors.accent,
+      fontSize: typography.xs,
+      marginTop: 2,
+      fontWeight: "500",
+    },
+    actions: {
+      flexDirection: "row",
+      gap: 4,
+    },
+    actionBtn: {
+      padding: 6,
+      borderRadius: radius.sm,
+      backgroundColor: colors.bgElevated,
+    },
+    description: {
+      color: colors.textSecondary,
+      fontSize: typography.sm,
+      lineHeight: 18,
+      paddingLeft: 30,
+    },
+    footer: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 6,
+      paddingLeft: 30,
+    },
+    dueDate: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 3,
+    },
+    dueDateText: {
+      color: colors.textMuted,
+      fontSize: typography.xs,
+    },
+  });

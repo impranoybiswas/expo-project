@@ -21,14 +21,17 @@ import Animated, {
 
 import { useAuthStore, useTaskStore } from "../store";
 import { useTasks } from "../hooks/useTasks";
+import { useTheme } from "../hooks/useTheme";
 import { TaskCard } from "../components/tasks/TaskCard";
-import { colors, typography, spacing, radius } from "../theme";
+import { typography, spacing, radius } from "../theme";
 
 const { width } = Dimensions.get("window");
 
 export function HomeScreen({ navigation }: any) {
   const { user } = useAuthStore();
   const { tasks, remove, update } = useTasks();
+  const { colors, isDark } = useTheme();
+  const styles = getStyles(colors);
   const progressValue = useSharedValue(0);
 
   const doneTasks = tasks.filter((t) => t.status === "done").length;
@@ -122,7 +125,11 @@ export function HomeScreen({ navigation }: any) {
               activeOpacity={0.9}
               style={styles.glassCardContainer}
             >
-              <BlurView intensity={20} tint="dark" style={styles.glassCard}>
+              <BlurView
+                intensity={20}
+                tint={isDark ? "dark" : "light"}
+                style={styles.glassCard}
+              >
                 <View style={styles.progressHeader}>
                   <View>
                     <Text style={styles.progressTitle}>Today's Progress</Text>
@@ -159,7 +166,11 @@ export function HomeScreen({ navigation }: any) {
                 entering={FadeInDown.delay(300 + idx * 100).duration(600)}
                 style={styles.statCard}
               >
-                <BlurView intensity={10} tint="dark" style={styles.statBlur}>
+                <BlurView
+                  intensity={10}
+                  tint={isDark ? "dark" : "light"}
+                  style={styles.statBlur}
+                >
                   <View
                     style={[
                       styles.statIcon,
@@ -257,159 +268,164 @@ export function HomeScreen({ navigation }: any) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  safe: { flex: 1 },
-  scroll: { padding: spacing.xl, paddingBottom: 110 },
+const getStyles = (colors: any) =>
+  StyleSheet.create({
+    container: { flex: 1 },
+    safe: { flex: 1 },
+    scroll: { padding: spacing.xl, paddingBottom: 110 },
 
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: spacing.xl,
-  },
-  greeting: {
-    color: colors.textSecondary,
-    fontSize: typography.sm,
-    fontWeight: "500",
-  },
-  userName: {
-    fontSize: typography["2xl"],
-    fontWeight: "800",
-    color: colors.textPrimary,
-    letterSpacing: -0.5,
-  },
-  avatarContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    overflow: "hidden",
-    borderWidth: 1.5,
-    borderColor: colors.border,
-  },
-  avatarGradient: { flex: 1, alignItems: "center", justifyContent: "center" },
-  avatarText: { color: "#fff", fontSize: typography.lg, fontWeight: "800" },
+    header: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: spacing.xl,
+    },
+    greeting: {
+      color: colors.textSecondary,
+      fontSize: typography.sm,
+      fontWeight: "500",
+    },
+    userName: {
+      fontSize: typography["2xl"],
+      fontWeight: "800",
+      color: colors.textPrimary,
+      letterSpacing: -0.5,
+    },
+    avatarContainer: {
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+      overflow: "hidden",
+      borderWidth: 1.5,
+      borderColor: colors.border,
+    },
+    avatarGradient: { flex: 1, alignItems: "center", justifyContent: "center" },
+    avatarText: { color: "#fff", fontSize: typography.lg, fontWeight: "800" },
 
-  glassCardContainer: {
-    marginBottom: spacing.xl,
-    borderRadius: radius["2xl"],
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: colors.bgGlassBorder,
-  },
-  glassCard: { padding: spacing.xl, backgroundColor: colors.bgGlass },
-  progressHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-end",
-    marginBottom: spacing.md,
-  },
-  progressTitle: {
-    fontSize: typography.base,
-    fontWeight: "600",
-    color: colors.textSecondary,
-  },
-  progressSub: {
-    fontSize: typography.lg,
-    fontWeight: "800",
-    color: colors.textPrimary,
-    marginTop: 4,
-  },
-  progressPercent: {
-    fontSize: typography["3xl"],
-    fontWeight: "900",
-    color: colors.accent,
-  },
+    glassCardContainer: {
+      marginBottom: spacing.xl,
+      borderRadius: radius["2xl"],
+      overflow: "hidden",
+      borderWidth: 1,
+      borderColor: colors.bgGlassBorder,
+    },
+    glassCard: { padding: spacing.xl, backgroundColor: colors.bgGlass },
+    progressHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "flex-end",
+      marginBottom: spacing.md,
+    },
+    progressTitle: {
+      fontSize: typography.base,
+      fontWeight: "600",
+      color: colors.textSecondary,
+    },
+    progressSub: {
+      fontSize: typography.lg,
+      fontWeight: "800",
+      color: colors.textPrimary,
+      marginTop: 4,
+    },
+    progressPercent: {
+      fontSize: typography["3xl"],
+      fontWeight: "900",
+      color: colors.accent,
+    },
 
-  progressBarBg: {
-    height: 10,
-    backgroundColor: "rgba(255,255,255,0.1)",
-    borderRadius: 5,
-    overflow: "hidden",
-  },
-  progressBarFill: { height: "100%", borderRadius: 5 },
+    progressBarBg: {
+      height: 10,
+      backgroundColor: "rgba(255,255,255,0.1)",
+      borderRadius: 5,
+      overflow: "hidden",
+    },
+    progressBarFill: { height: "100%", borderRadius: 5 },
 
-  statsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: spacing.sm,
-    marginBottom: spacing.xl,
-  },
-  statCard: {
-    flex: 1,
-    minWidth: (width - spacing.xl * 2 - spacing.sm) / 2,
-    height: 110,
-    borderRadius: radius.xl,
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: colors.bgGlassBorder,
-  },
-  statBlur: {
-    flex: 1,
-    padding: spacing.base,
-    backgroundColor: colors.bgGlass,
-    justifyContent: "space-between",
-  },
-  statIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: radius.md,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  statValue: {
-    fontSize: typography.xl,
-    fontWeight: "800",
-    color: colors.textPrimary,
-  },
-  statLabel: {
-    fontSize: typography.xs,
-    color: colors.textSecondary,
-    fontWeight: "500",
-  },
+    statsGrid: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: spacing.sm,
+      marginBottom: spacing.xl,
+    },
+    statCard: {
+      flex: 1,
+      minWidth: (width - spacing.xl * 2 - spacing.sm) / 2,
+      height: 110,
+      borderRadius: radius.xl,
+      overflow: "hidden",
+      borderWidth: 1,
+      borderColor: colors.bgGlassBorder,
+    },
+    statBlur: {
+      flex: 1,
+      padding: spacing.base,
+      backgroundColor: colors.bgGlass,
+      justifyContent: "space-between",
+    },
+    statIcon: {
+      width: 32,
+      height: 32,
+      borderRadius: radius.md,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    statValue: {
+      fontSize: typography.xl,
+      fontWeight: "800",
+      color: colors.textPrimary,
+    },
+    statLabel: {
+      fontSize: typography.xs,
+      color: colors.textSecondary,
+      fontWeight: "500",
+    },
 
-  sectionHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: spacing.base,
-  },
-  sectionTitle: {
-    fontSize: typography.lg,
-    fontWeight: "700",
-    color: colors.textPrimary,
-  },
-  seeAll: { fontSize: typography.sm, color: colors.accent, fontWeight: "600" },
+    sectionHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: spacing.base,
+    },
+    sectionTitle: {
+      fontSize: typography.lg,
+      fontWeight: "700",
+      color: colors.textPrimary,
+    },
+    seeAll: {
+      fontSize: typography.sm,
+      color: colors.accent,
+      fontWeight: "600",
+    },
 
-  emptyState: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 40,
-    opacity: 0.8,
-  },
-  emptyText: {
-    color: colors.textPrimary,
-    fontSize: typography.lg,
-    fontWeight: "700",
-    marginTop: 12,
-  },
-  emptySub: {
-    color: colors.textSecondary,
-    fontSize: typography.sm,
-    marginTop: 4,
-  },
+    emptyState: {
+      alignItems: "center",
+      justifyContent: "center",
+      paddingVertical: 40,
+      opacity: 0.8,
+    },
+    emptyText: {
+      color: colors.textPrimary,
+      fontSize: typography.lg,
+      fontWeight: "700",
+      marginTop: 12,
+    },
+    emptySub: {
+      color: colors.textSecondary,
+      fontSize: typography.sm,
+      marginTop: 4,
+    },
 
-  fabContainer: { position: "absolute", bottom: 110, right: 24, zIndex: 10 },
-  fab: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    overflow: "hidden",
-    elevation: 8,
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-  },
-  fabGradient: { flex: 1, alignItems: "center", justifyContent: "center" },
-});
+    fabContainer: { position: "absolute", bottom: 110, right: 24, zIndex: 10 },
+    fab: {
+      width: 60,
+      height: 60,
+      borderRadius: 30,
+      overflow: "hidden",
+      elevation: 8,
+      shadowColor: colors.primary,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+    },
+    fabGradient: { flex: 1, alignItems: "center", justifyContent: "center" },
+  });

@@ -16,9 +16,10 @@ import Animated, { FadeInDown, Layout } from "react-native-reanimated";
 
 import { useTasks } from "../../hooks/useTasks";
 import { useTaskStore } from "../../store";
+import { useTheme } from "../../hooks/useTheme";
 import { TaskCard } from "../../components/tasks/TaskCard";
 import { EmptyState } from "../../components/common";
-import { colors, typography, spacing, radius } from "../../theme";
+import { typography, spacing, radius } from "../../theme";
 import type { TaskStatus } from "../../types";
 
 const STATUS_TABS: { key: TaskStatus | "all"; label: string }[] = [
@@ -31,6 +32,8 @@ const STATUS_TABS: { key: TaskStatus | "all"; label: string }[] = [
 export function TaskListScreen({ navigation }: any) {
   const { tasks, isLoading, update, remove } = useTasks();
   const { setFilter, filter, getFilteredTasks } = useTaskStore();
+  const { colors, isDark } = useTheme();
+  const styles = getStyles(colors);
   const [activeTab, setActiveTab] = useState<TaskStatus | "all">("all");
 
   const filteredTasks = getFilteredTasks();
@@ -80,7 +83,11 @@ export function TaskListScreen({ navigation }: any) {
           entering={FadeInDown.delay(100)}
           style={styles.statsContainer}
         >
-          <BlurView intensity={20} tint="dark" style={styles.statsRow}>
+          <BlurView
+            intensity={20}
+            tint={isDark ? "dark" : "light"}
+            style={styles.statsRow}
+          >
             <View style={styles.statBox}>
               <Text style={styles.statNum}>{stats.total}</Text>
               <Text style={styles.statLabel}>Total</Text>
@@ -124,7 +131,11 @@ export function TaskListScreen({ navigation }: any) {
                       <Text style={styles.tabTextActive}>{tab.label}</Text>
                     </LinearGradient>
                   ) : (
-                    <BlurView intensity={10} tint="dark" style={styles.tab}>
+                    <BlurView
+                      intensity={10}
+                      tint={isDark ? "dark" : "light"}
+                      style={styles.tab}
+                    >
                       <Text style={styles.tabText}>{tab.label}</Text>
                     </BlurView>
                   )}
@@ -177,90 +188,95 @@ export function TaskListScreen({ navigation }: any) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  safe: { flex: 1 },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.lg,
-  },
-  headerTitle: {
-    fontSize: typography["2xl"],
-    fontWeight: "900",
-    color: colors.textPrimary,
-    letterSpacing: -0.5,
-  },
-  headerSub: {
-    color: colors.textSecondary,
-    fontSize: typography.sm,
-    fontWeight: "500",
-  },
-  addBtnContainer: {
-    borderRadius: radius.lg,
-    overflow: "hidden",
-    elevation: 4,
-  },
-  addBtn: {
-    width: 44,
-    height: 44,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+const getStyles = (colors: any) =>
+  StyleSheet.create({
+    container: { flex: 1 },
+    safe: { flex: 1 },
+    header: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingHorizontal: spacing.xl,
+      paddingVertical: spacing.lg,
+    },
+    headerTitle: {
+      fontSize: typography["2xl"],
+      fontWeight: "900",
+      color: colors.textPrimary,
+      letterSpacing: -0.5,
+    },
+    headerSub: {
+      color: colors.textSecondary,
+      fontSize: typography.sm,
+      fontWeight: "500",
+    },
+    addBtnContainer: {
+      borderRadius: radius.lg,
+      overflow: "hidden",
+      elevation: 4,
+    },
+    addBtn: {
+      width: 44,
+      height: 44,
+      alignItems: "center",
+      justifyContent: "center",
+    },
 
-  statsContainer: {
-    marginHorizontal: spacing.xl,
-    marginBottom: spacing.lg,
-    borderRadius: radius.xl,
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: colors.bgGlassBorder,
-  },
-  statsRow: {
-    flexDirection: "row",
-    backgroundColor: colors.bgGlass,
-    paddingVertical: spacing.md,
-  },
-  statBox: { flex: 1, alignItems: "center" },
-  statDivider: {
-    borderLeftWidth: 1,
-    borderRightWidth: 1,
-    borderColor: colors.border,
-  },
-  statNum: {
-    fontSize: typography.xl,
-    fontWeight: "900",
-    color: colors.textPrimary,
-  },
-  statLabel: {
-    color: colors.textMuted,
-    fontSize: typography.xs,
-    fontWeight: "600",
-    marginTop: 2,
-  },
+    statsContainer: {
+      marginHorizontal: spacing.xl,
+      marginBottom: spacing.lg,
+      borderRadius: radius.xl,
+      overflow: "hidden",
+      borderWidth: 1,
+      borderColor: colors.bgGlassBorder,
+    },
+    statsRow: {
+      flexDirection: "row",
+      backgroundColor: colors.bgGlass,
+      paddingVertical: spacing.md,
+    },
+    statBox: { flex: 1, alignItems: "center" },
+    statDivider: {
+      borderLeftWidth: 1,
+      borderRightWidth: 1,
+      borderColor: colors.border,
+    },
+    statNum: {
+      fontSize: typography.xl,
+      fontWeight: "900",
+      color: colors.textPrimary,
+    },
+    statLabel: {
+      color: colors.textMuted,
+      fontSize: typography.xs,
+      fontWeight: "600",
+      marginTop: 2,
+    },
 
-  tabsContainer: { marginBottom: spacing.lg },
-  tabs: { paddingHorizontal: spacing.xl, gap: spacing.sm },
-  tabWrapper: {
-    borderRadius: radius.full,
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: colors.bgGlassBorder,
-  },
-  tab: {
-    paddingHorizontal: spacing.xl,
-    paddingVertical: 8,
-    backgroundColor: colors.bgGlass,
-  },
-  tabActive: { paddingHorizontal: spacing.xl, paddingVertical: 8 },
-  tabText: {
-    color: colors.textSecondary,
-    fontSize: typography.sm,
-    fontWeight: "600",
-  },
-  tabTextActive: { color: "#fff", fontSize: typography.sm, fontWeight: "700" },
+    tabsContainer: { marginBottom: spacing.lg },
+    tabs: { paddingHorizontal: spacing.xl, gap: spacing.sm },
+    tabWrapper: {
+      borderRadius: radius.full,
+      overflow: "hidden",
+      borderWidth: 1,
+      borderColor: colors.bgGlassBorder,
+    },
+    tab: {
+      paddingHorizontal: spacing.xl,
+      paddingVertical: 8,
+      backgroundColor: colors.bgGlass,
+    },
+    tabActive: { paddingHorizontal: spacing.xl, paddingVertical: 8 },
+    tabText: {
+      color: colors.textSecondary,
+      fontSize: typography.sm,
+      fontWeight: "600",
+    },
+    tabTextActive: {
+      color: "#fff",
+      fontSize: typography.sm,
+      fontWeight: "700",
+    },
 
-  list: { paddingHorizontal: spacing.xl, paddingBottom: 100 },
-});
+    list: { paddingHorizontal: spacing.xl, paddingBottom: 100 },
+  });

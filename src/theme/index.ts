@@ -1,46 +1,65 @@
 // src/theme/index.ts
 
-export const colors = {
-  // Primary Palette - Deep Indigo + Electric Cyan
-  primary: "#5E5CE6", // More vibrant indigo
+// src/theme/index.ts
+
+export type ThemeMode = "dark" | "light";
+
+export const darkColors = {
+  primary: "#5E5CE6",
   primaryLight: "#8B8AF0",
   primaryDark: "#3F3D89",
-  accent: "#00D2FF", // Electric Cyan
+  accent: "#5AC8FA",
   accentLight: "#60EFFF",
-
-  // Backgrounds
   bg: "#050510",
   bgCard: "#0C0C1A",
   bgElevated: "#16162C",
-  bgGlass: "rgba(255, 255, 255, 0.03)",
-  bgGlassBorder: "rgba(255, 255, 255, 0.08)",
-
-  // Text
+  bgGlass: "rgba(255, 255, 255, 0.05)",
+  bgGlassBorder: "rgba(255, 255, 255, 0.1)",
   textPrimary: "#FFFFFF",
   textSecondary: "#A0A0C0",
   textMuted: "#505070",
-
-  // Status
-  success: "#34C759",
-  warning: "#FFCC00",
-  error: "#FF3B30",
-  info: "#007AFF",
-
-  // Priority Colors
-  priorityLow: "#34C759",
-  priorityMedium: "#FF9500",
-  priorityHigh: "#FF3B30",
-
-  // Borders
-  border: "rgba(255, 255, 255, 0.06)",
-  borderFocus: "#5E5CE6",
-
-  // Gradients
+  success: "#32D74B",
+  warning: "#FF9F0A",
+  error: "#FF453A",
+  info: "#0A84FF",
+  border: "rgba(255, 255, 255, 0.08)",
+  gradientDark: ["#050510", "#0C0C1A"] as const,
   gradientPrimary: ["#5E5CE6", "#BF5AF2"] as const,
   gradientAccent: ["#00D2FF", "#007AFF"] as const,
-  gradientDark: ["#050510", "#0C0C1A"] as const,
-  gradientCard: ["#16162C", "#0C0C1A"] as const,
-  gradientGlass: ["rgba(255,255,255,0.05)", "rgba(255,255,255,0.01)"] as const,
+  tabBar: "rgba(12, 12, 26, 0.95)",
+};
+
+export const lightColors = {
+  primary: "#5E5CE6",
+  primaryLight: "#8B8AF0",
+  primaryDark: "#3F3D89",
+  accent: "#007AFF",
+  accentLight: "#00D2FF",
+  bg: "#F2F2F7",
+  bgCard: "#FFFFFF",
+  bgElevated: "#FFFFFF",
+  bgGlass: "rgba(0, 0, 0, 0.05)",
+  bgGlassBorder: "rgba(0, 0, 0, 0.08)",
+  textPrimary: "#000000",
+  textSecondary: "#3C3C43",
+  textMuted: "#8E8E93",
+  success: "#28CD41",
+  warning: "#FF9500",
+  error: "#FF3B30",
+  info: "#007AFF",
+  border: "rgba(0, 0, 0, 0.12)",
+  gradientDark: ["#F2F2F7", "#E5E5EA"] as const,
+  gradientPrimary: ["#5E5CE6", "#BF5AF2"] as const,
+  gradientAccent: ["#00D2FF", "#007AFF"] as const,
+  tabBar: "rgba(255, 255, 255, 0.9)",
+};
+
+export const colors = darkColors; // Temporary backward compatibility
+
+export const priorityColors = {
+  low: "#34C759",
+  medium: "#FF9500",
+  high: "#FF3B30",
 };
 
 export const typography = {

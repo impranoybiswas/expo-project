@@ -9,7 +9,8 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { colors, typography, spacing, radius } from "../../theme";
+import { useTheme } from "../../hooks/useTheme";
+import { typography, spacing, radius } from "../../theme";
 
 // ─── Button ──────────────────────────────────────────────────
 interface ButtonProps {
@@ -31,6 +32,8 @@ export function Button({
   icon,
   style,
 }: ButtonProps) {
+  const { colors } = useTheme();
+  const styles = getStyles(colors);
   const isOutline = variant === "outline";
   const isGhost = variant === "ghost";
   const isSecondary = variant === "secondary";
@@ -127,6 +130,8 @@ export function Input({
   multiline,
   numberOfLines,
 }: InputProps) {
+  const { colors } = useTheme();
+  const styles = getStyles(colors);
   const [focused, setFocused] = useState(false);
 
   return (
@@ -167,6 +172,8 @@ interface BadgeProps {
 }
 
 export function Badge({ label, color, bgColor }: BadgeProps) {
+  const { colors } = useTheme();
+  const styles = getStyles(colors);
   return (
     <View style={[styles.badge, { backgroundColor: bgColor }]}>
       <Text style={[styles.badgeText, { color }]}>{label}</Text>
@@ -181,6 +188,8 @@ interface CardProps {
 }
 
 export function Card({ children, style }: CardProps) {
+  const { colors } = useTheme();
+  const styles = getStyles(colors);
   return <View style={[styles.card, style]}>{children}</View>;
 }
 
@@ -192,6 +201,8 @@ interface EmptyStateProps {
 }
 
 export function EmptyState({ icon, title, subtitle }: EmptyStateProps) {
+  const { colors } = useTheme();
+  const styles = getStyles(colors);
   return (
     <View style={styles.emptyState}>
       <Text style={styles.emptyIconText}>{icon}</Text>
@@ -201,118 +212,119 @@ export function EmptyState({ icon, title, subtitle }: EmptyStateProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  // Button
-  btnContainer: {
-    borderRadius: radius.lg,
-    overflow: "hidden",
-  },
-  btnGradient: {
-    paddingVertical: 14,
-    paddingHorizontal: spacing.xl,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  btnBase: {
-    paddingVertical: 14,
-    paddingHorizontal: spacing.xl,
-    borderRadius: radius.lg,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  btnContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  btnLabel: {
-    color: "#fff",
-    fontSize: typography.base,
-    fontWeight: "700",
-    letterSpacing: 0.5,
-  },
+const getStyles = (colors: any) =>
+  StyleSheet.create({
+    // Button
+    btnContainer: {
+      borderRadius: radius.lg,
+      overflow: "hidden",
+    },
+    btnGradient: {
+      paddingVertical: 14,
+      paddingHorizontal: spacing.xl,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    btnBase: {
+      paddingVertical: 14,
+      paddingHorizontal: spacing.xl,
+      borderRadius: radius.lg,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    btnContent: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    btnLabel: {
+      color: "#fff",
+      fontSize: typography.base,
+      fontWeight: "700",
+      letterSpacing: 0.5,
+    },
 
-  // Input
-  inputContainer: {
-    marginBottom: spacing.base,
-  },
-  inputLabel: {
-    color: colors.textSecondary,
-    fontSize: typography.sm,
-    fontWeight: "600",
-    marginBottom: 8,
-    marginLeft: 4,
-  },
-  inputWrapper: {
-    backgroundColor: colors.bgCard,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  inputWrapperFocused: {
-    borderColor: colors.primary,
-    backgroundColor: colors.bgElevated,
-  },
-  inputWrapperError: {
-    borderColor: colors.error,
-  },
-  input: {
-    flex: 1,
-    paddingHorizontal: spacing.base,
-    paddingVertical: 14,
-    color: colors.textPrimary,
-    fontSize: typography.base,
-  },
-  errorText: {
-    color: colors.error,
-    fontSize: typography.xs,
-    marginTop: 4,
-    marginLeft: 4,
-  },
+    // Input
+    inputContainer: {
+      marginBottom: spacing.base,
+    },
+    inputLabel: {
+      color: colors.textSecondary,
+      fontSize: typography.sm,
+      fontWeight: "600",
+      marginBottom: 8,
+      marginLeft: 4,
+    },
+    inputWrapper: {
+      backgroundColor: colors.bgCard,
+      borderRadius: radius.lg,
+      borderWidth: 1,
+      borderColor: colors.border,
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    inputWrapperFocused: {
+      borderColor: colors.primary,
+      backgroundColor: colors.bgElevated,
+    },
+    inputWrapperError: {
+      borderColor: colors.error,
+    },
+    input: {
+      flex: 1,
+      paddingHorizontal: spacing.base,
+      paddingVertical: 14,
+      color: colors.textPrimary,
+      fontSize: typography.base,
+    },
+    errorText: {
+      color: colors.error,
+      fontSize: typography.xs,
+      marginTop: 4,
+      marginLeft: 4,
+    },
 
-  // Badge
-  badge: {
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 4,
-    borderRadius: radius.md,
-    alignSelf: "flex-start",
-  },
-  badgeText: {
-    fontSize: typography.xs,
-    fontWeight: "700",
-    textTransform: "uppercase",
-  },
+    // Badge
+    badge: {
+      paddingHorizontal: spacing.sm,
+      paddingVertical: 4,
+      borderRadius: radius.md,
+      alignSelf: "flex-start",
+    },
+    badgeText: {
+      fontSize: typography.xs,
+      fontWeight: "700",
+      textTransform: "uppercase",
+    },
 
-  // Card
-  card: {
-    backgroundColor: colors.bgCard,
-    borderRadius: radius.xl,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.base,
-  },
+    // Card
+    card: {
+      backgroundColor: colors.bgCard,
+      borderRadius: radius.xl,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: spacing.base,
+    },
 
-  // Empty State
-  emptyState: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: spacing["3xl"],
-    gap: spacing.sm,
-  },
-  emptyIconText: { fontSize: 48, marginBottom: spacing.sm },
-  emptyTitle: {
-    color: colors.textPrimary,
-    fontSize: typography.lg,
-    fontWeight: "700",
-    textAlign: "center",
-  },
-  emptySubtitle: {
-    color: colors.textSecondary,
-    fontSize: typography.sm,
-    textAlign: "center",
-    lineHeight: 20,
-  },
-});
+    // Empty State
+    emptyState: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      padding: spacing["3xl"],
+      gap: spacing.sm,
+    },
+    emptyIconText: { fontSize: 48, marginBottom: spacing.sm },
+    emptyTitle: {
+      color: colors.textPrimary,
+      fontSize: typography.lg,
+      fontWeight: "700",
+      textAlign: "center",
+    },
+    emptySubtitle: {
+      color: colors.textSecondary,
+      fontSize: typography.sm,
+      textAlign: "center",
+      lineHeight: 20,
+    },
+  });

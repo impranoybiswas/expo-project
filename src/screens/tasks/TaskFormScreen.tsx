@@ -14,10 +14,11 @@ import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 
+import { useTheme } from "../../hooks/useTheme";
 import { useTasks } from "../../hooks/useTasks";
 import { getTask } from "../../services/taskService";
 import { Button, Input } from "../../components/common";
-import { colors, typography, spacing, radius } from "../../theme";
+import { typography, spacing, radius, priorityColors } from "../../theme";
 import type { TaskPriority, TaskStatus } from "../../types";
 
 const PRIORITIES: TaskPriority[] = ["low", "medium", "high"];
@@ -32,12 +33,14 @@ const CATEGORIES = [
 ];
 
 const PRIORITY_COLORS: Record<TaskPriority, string> = {
-  low: colors.priorityLow,
-  medium: colors.priorityMedium,
-  high: colors.priorityHigh,
+  low: priorityColors.low,
+  medium: priorityColors.medium,
+  high: priorityColors.high,
 };
 
 export function TaskFormScreen({ navigation, route }: any) {
+  const { colors, isDark } = useTheme();
+  const styles = getStyles(colors);
   const { taskId } = route.params ?? {};
   const isEdit = !!taskId;
 
@@ -134,7 +137,11 @@ export function TaskFormScreen({ navigation, route }: any) {
             onPress={() => navigation.goBack()}
             style={styles.backBtnContainer}
           >
-            <BlurView intensity={20} tint="dark" style={styles.backBtn}>
+            <BlurView
+              intensity={20}
+              tint={isDark ? "dark" : "light"}
+              style={styles.backBtn}
+            >
               <Ionicons
                 name="arrow-back"
                 size={20}
@@ -161,7 +168,11 @@ export function TaskFormScreen({ navigation, route }: any) {
               entering={FadeInDown.duration(600)}
               style={styles.sectionCard}
             >
-              <BlurView intensity={20} tint="dark" style={styles.blurCard}>
+              <BlurView
+                intensity={20}
+                tint={isDark ? "dark" : "light"}
+                style={styles.blurCard}
+              >
                 <Input
                   label="Task Title *"
                   value={title}
@@ -185,7 +196,11 @@ export function TaskFormScreen({ navigation, route }: any) {
               entering={FadeInUp.delay(200)}
               style={styles.sectionCard}
             >
-              <BlurView intensity={15} tint="dark" style={styles.blurCard}>
+              <BlurView
+                intensity={15}
+                tint={isDark ? "dark" : "light"}
+                style={styles.blurCard}
+              >
                 <Text style={styles.sectionLabel}>Priority</Text>
                 <View style={styles.optionRow}>
                   {PRIORITIES.map((p) => {
@@ -201,7 +216,7 @@ export function TaskFormScreen({ navigation, route }: any) {
                       >
                         <BlurView
                           intensity={isActive ? 40 : 5}
-                          tint="dark"
+                          tint={isDark ? "dark" : "light"}
                           style={styles.chipBlur}
                         >
                           <View
@@ -248,7 +263,7 @@ export function TaskFormScreen({ navigation, route }: any) {
                       >
                         <BlurView
                           intensity={isActive ? 40 : 5}
-                          tint="dark"
+                          tint={isDark ? "dark" : "light"}
                           style={styles.chipBlur}
                         >
                           <Ionicons
@@ -296,85 +311,86 @@ export function TaskFormScreen({ navigation, route }: any) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-  safe: { flex: 1 },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.lg,
-  },
-  backBtnContainer: {
-    borderRadius: radius.lg,
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: colors.bgGlassBorder,
-  },
-  backBtn: {
-    width: 40,
-    height: 40,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: colors.bgGlass,
-  },
-  headerTitle: {
-    fontSize: typography.lg,
-    fontWeight: "800",
-    color: colors.textPrimary,
-  },
+const getStyles = (colors: any) =>
+  StyleSheet.create({
+    container: { flex: 1 },
+    safe: { flex: 1 },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: spacing.xl,
+      paddingVertical: spacing.lg,
+    },
+    backBtnContainer: {
+      borderRadius: radius.lg,
+      overflow: "hidden",
+      borderWidth: 1,
+      borderColor: colors.bgGlassBorder,
+    },
+    backBtn: {
+      width: 40,
+      height: 40,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.bgGlass,
+    },
+    headerTitle: {
+      fontSize: typography.lg,
+      fontWeight: "800",
+      color: colors.textPrimary,
+    },
 
-  scroll: { padding: spacing.xl, gap: spacing.lg, paddingBottom: 60 },
-  sectionCard: {
-    borderRadius: radius["2xl"],
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: colors.bgGlassBorder,
-  },
-  blurCard: { padding: spacing.xl, backgroundColor: colors.bgGlass },
+    scroll: { padding: spacing.xl, gap: spacing.lg, paddingBottom: 140 },
+    sectionCard: {
+      borderRadius: radius["2xl"],
+      overflow: "hidden",
+      borderWidth: 1,
+      borderColor: colors.bgGlassBorder,
+    },
+    blurCard: { padding: spacing.xl, backgroundColor: colors.bgGlass },
 
-  sectionLabel: {
-    color: colors.textSecondary,
-    fontSize: typography.xs,
-    fontWeight: "700",
-    marginBottom: spacing.base,
-    textTransform: "uppercase",
-    letterSpacing: 1,
-  },
-  optionRow: { flexDirection: "row", gap: spacing.sm },
-  chip: {
-    borderRadius: radius.full,
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: colors.bgGlassBorder,
-    width: 90,
-  },
-  chipBlur: {
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 6,
-    backgroundColor: colors.bgGlass,
-    height: 40,
-  },
-  dot: { width: 6, height: 6, borderRadius: 3 },
-  chipText: { fontSize: 11, color: colors.textSecondary, fontWeight: "600" },
+    sectionLabel: {
+      color: colors.textSecondary,
+      fontSize: typography.xs,
+      fontWeight: "700",
+      marginBottom: spacing.base,
+      textTransform: "uppercase",
+      letterSpacing: 1,
+    },
+    optionRow: { flexDirection: "row", gap: spacing.sm },
+    chip: {
+      borderRadius: radius.full,
+      overflow: "hidden",
+      borderWidth: 1,
+      borderColor: colors.bgGlassBorder,
+      width: 90,
+    },
+    chipBlur: {
+      paddingVertical: 10,
+      paddingHorizontal: 12,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 6,
+      backgroundColor: colors.bgGlass,
+      height: 40,
+    },
+    dot: { width: 6, height: 6, borderRadius: 3 },
+    chipText: { fontSize: 11, color: colors.textSecondary, fontWeight: "600" },
 
-  categoryScroll: { gap: spacing.sm, paddingRight: spacing.xl },
-  categoryChip: {
-    borderRadius: radius.full,
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: colors.bgGlassBorder,
-    minWidth: 100,
-  },
-  errorText: {
-    color: colors.error,
-    fontSize: typography.sm,
-    textAlign: "center",
-    fontWeight: "600",
-  },
-});
+    categoryScroll: { gap: spacing.sm, paddingRight: spacing.xl },
+    categoryChip: {
+      borderRadius: radius.full,
+      overflow: "hidden",
+      borderWidth: 1,
+      borderColor: colors.bgGlassBorder,
+      minWidth: 100,
+    },
+    errorText: {
+      color: colors.error,
+      fontSize: typography.sm,
+      textAlign: "center",
+      fontWeight: "600",
+    },
+  });
