@@ -4,45 +4,52 @@ Firebase-powered Task Manager with full CRUD, authentication, and realtime updat
 
 ---
 
-## 🚀 Setup করুন
+## 🚀 Setup
 
-### ১. Dependencies install করুন
+### 1. Install Dependencies
+
 ```bash
 npm install
 ```
 
-### ২. Firebase Project তৈরি করুন
-1. [Firebase Console](https://console.firebase.google.com/) এ যান
-2. নতুন project তৈরি করুন
-3. **Authentication** enable করুন → Email/Password sign-in চালু করুন
-4. **Firestore Database** তৈরি করুন (Test mode দিয়ে শুরু করুন)
-5. Project Settings → Your Apps → Web App → SDK config copy করুন
+### 2. Create Firebase Project
 
-### ৩. Environment Variables সেট করুন
+1. Go to the [Firebase Console](https://console.firebase.google.com/)
+2. Create a new project
+3. Enable **Authentication** → Turn on **Email/Password sign-in**
+4. Create a **Firestore Database** (start in **Test mode**)
+5. Go to **Project Settings** → **Your Apps** → **Web App** → Copy the **SDK config**
+
+### 3. Set Environment Variables
+
 ```bash
 cp .env.example .env
 ```
-`.env` file খুলে Firebase config values দিন।
 
-### ৪. Firestore Security Rules (Production-এ)
+Open the `.env` file and add your Firebase configuration values.
+
+### 4. Firestore Security Rules (for Production)
+
 Firebase Console → Firestore → Rules:
+
 ```
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /tasks/{taskId} {
-      allow read, write: if request.auth != null 
+      allow read, write: if request.auth != null
         && request.auth.uid == resource.data.userId;
-      allow create: if request.auth != null 
+      allow create: if request.auth != null
         && request.auth.uid == request.resource.data.userId;
     }
   }
 }
 ```
 
-### ৫. App চালু করুন
+### 5. Run the Application
+
 ```bash
-# Expo Go দিয়ে (সহজ)
+# With Expo Go (easiest)
 npx expo start
 
 # Android
@@ -96,18 +103,18 @@ TaskApp/
 - 🏷️ Category filtering
 - 📡 Realtime Firestore listener
 - 🌙 Dark theme with indigo + cyan palette
-- 🇧🇩 Bengali language support
+- 🌈 Dynamic Light/Dark mode toggle (powered by Zustand, accessible from Profile)
 
 ---
 
 ## 🛠 Tech Stack
 
-| Tool | Purpose |
-|------|---------|
-| React Native + Expo | Mobile framework |
-| TypeScript | Type safety |
-| Firebase Firestore | Database + realtime |
-| Firebase Auth | Authentication |
-| React Navigation | Navigation |
-| Zustand | State management |
-| @expo/vector-icons | Icons |
+| Tool                | Purpose             |
+| ------------------- | ------------------- |
+| React Native + Expo | Mobile framework    |
+| TypeScript          | Type safety         |
+| Firebase Firestore  | Database + realtime |
+| Firebase Auth       | Authentication      |
+| React Navigation    | Navigation          |
+| Zustand             | State management    |
+| @expo/vector-icons  | Icons               |
