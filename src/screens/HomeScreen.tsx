@@ -399,7 +399,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
 
-  fabContainer: { position: "absolute", bottom: 30, right: 24, zIndex: 10 },
+  fabContainer: { position: "absolute", bottom: 110, right: 24, zIndex: 10 },
   fab: {
     width: 60,
     height: 60,

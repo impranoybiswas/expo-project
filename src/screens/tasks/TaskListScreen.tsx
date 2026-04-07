@@ -164,8 +164,8 @@ export function TaskListScreen({ navigation }: any) {
           ListEmptyComponent={
             <EmptyState
               icon="📋"
-              title="কোনো task পাওয়া যায়নি"
-              subtitle="এই ক্যাটাগরিতে কোনো task নেই"
+              title="No tasks found"
+              subtitle="There are no tasks in this category"
             />
           }
           refreshControl={

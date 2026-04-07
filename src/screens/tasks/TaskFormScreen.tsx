@@ -23,12 +23,12 @@ import type { TaskPriority, TaskStatus } from "../../types";
 const PRIORITIES: TaskPriority[] = ["low", "medium", "high"];
 const STATUSES: TaskStatus[] = ["todo", "in-progress", "done"];
 const CATEGORIES = [
-  "General",
-  "Work",
-  "Personal",
-  "Shopping",
-  "Health",
-  "Study",
+  { name: "General", icon: "apps-outline" },
+  { name: "Work", icon: "briefcase-outline" },
+  { name: "Personal", icon: "person-outline" },
+  { name: "Shopping", icon: "cart-outline" },
+  { name: "Health", icon: "heart-outline" },
+  { name: "Study", icon: "book-outline" },
 ];
 
 const PRIORITY_COLORS: Record<TaskPriority, string> = {
@@ -60,7 +60,7 @@ export function TaskFormScreen({ navigation, route }: any) {
           setDescription(task.description);
           setPriority(task.priority);
           setStatus(task.status);
-          setCategory(task.category);
+          setCategory(task.category || "General");
         }
         setFetchLoading(false);
       });
@@ -230,15 +230,19 @@ export function TaskFormScreen({ navigation, route }: any) {
                 <Text style={[styles.sectionLabel, { marginTop: spacing.xl }]}>
                   Category
                 </Text>
-                <View style={styles.categoryGrid}>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.categoryScroll}
+                >
                   {CATEGORIES.map((c) => {
-                    const isActive = category === c;
+                    const isActive = category === c.name;
                     return (
                       <TouchableOpacity
-                        key={c}
-                        onPress={() => setCategory(c)}
+                        key={c.name}
+                        onPress={() => setCategory(c.name)}
                         style={[
-                          styles.chip,
+                          styles.categoryChip,
                           isActive && { borderColor: colors.accent },
                         ]}
                       >
@@ -247,6 +251,13 @@ export function TaskFormScreen({ navigation, route }: any) {
                           tint="dark"
                           style={styles.chipBlur}
                         >
+                          <Ionicons
+                            name={c.icon as any}
+                            size={16}
+                            color={
+                              isActive ? colors.accent : colors.textSecondary
+                            }
+                          />
                           <Text
                             style={[
                               styles.chipText,
@@ -256,13 +267,13 @@ export function TaskFormScreen({ navigation, route }: any) {
                               },
                             ]}
                           >
-                            {c}
+                            {c.name}
                           </Text>
                         </BlurView>
                       </TouchableOpacity>
                     );
                   })}
-                </View>
+                </ScrollView>
               </BlurView>
             </Animated.View>
 
@@ -337,7 +348,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     borderWidth: 1,
     borderColor: colors.bgGlassBorder,
-    flex: 1,
+    width: 90,
   },
   chipBlur: {
     paddingVertical: 10,
@@ -347,11 +358,19 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 6,
     backgroundColor: colors.bgGlass,
+    height: 40,
   },
   dot: { width: 6, height: 6, borderRadius: 3 },
-  chipText: { fontSize: 10, color: colors.textSecondary, fontWeight: "600" },
+  chipText: { fontSize: 11, color: colors.textSecondary, fontWeight: "600" },
 
-  categoryGrid: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
+  categoryScroll: { gap: spacing.sm, paddingRight: spacing.xl },
+  categoryChip: {
+    borderRadius: radius.full,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: colors.bgGlassBorder,
+    minWidth: 100,
+  },
   errorText: {
     color: colors.error,
     fontSize: typography.sm,
