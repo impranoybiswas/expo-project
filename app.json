@@ -12,22 +12,16 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.yourname.taskflow",
-      "googleServicesFile": "./GoogleService-Info.plist"
+      "bundleIdentifier": "com.yourname.taskflow"
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#0A0A14"
       },
-      "package": "com.yourname.taskflow",
-      "googleServicesFile": "./google-services.json"
+      "package": "com.yourname.taskflow"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    },
-    "plugins": [
-      "@react-native-firebase/app",
-      "@react-native-firebase/auth"
-    ]
+    }
   }
 }
