@@ -1,21 +1,21 @@
-// src/navigation/index.tsx
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Ionicons } from '@expo/vector-icons';
+import React from "react";
+import { View, Text } from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { Ionicons } from "@expo/vector-icons";
 
-import { useAuthStore } from '../store';
-import { colors, radius } from '../theme';
+import { useAuthStore } from "../store";
+import { colors, radius } from "../theme";
 
 // Screens
-import { LoginScreen } from '../screens/auth/LoginScreen';
-import { RegisterScreen } from '../screens/auth/RegisterScreen';
-import { HomeScreen } from '../screens/HomeScreen';
-import { TaskListScreen } from '../screens/tasks/TaskListScreen';
-import { TaskFormScreen } from '../screens/tasks/TaskFormScreen';
-import { TaskDetailScreen } from '../screens/tasks/TaskDetailScreen';
-import { ProfileScreen } from '../screens/ProfileScreen';
+import { LoginScreen } from "../screens/auth/LoginScreen";
+import { RegisterScreen } from "../screens/auth/RegisterScreen";
+import { HomeScreen } from "../screens/HomeScreen";
+import { TaskListScreen } from "../screens/tasks/TaskListScreen";
+import { TaskFormScreen } from "../screens/tasks/TaskFormScreen";
+import { TaskDetailScreen } from "../screens/tasks/TaskDetailScreen";
+import { ProfileScreen } from "../screens/ProfileScreen";
 
 const RootStack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator();
@@ -50,37 +50,70 @@ function MainNavigator() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
+        tabBarHideOnKeyboard: true,
         tabBarStyle: {
-          backgroundColor: colors.bgCard,
-          borderTopColor: colors.border,
+          backgroundColor: "rgba(12, 12, 26, 0.95)",
+          borderTopColor: "rgba(255, 255, 255, 0.08)",
           borderTopWidth: 1,
           paddingBottom: 8,
           paddingTop: 8,
-          height: 64,
+          height: 68,
+          position: "absolute",
+          bottom: 20,
+          left: 20,
+          right: 20,
+          borderRadius: 24,
+          elevation: 0,
+          shadowOpacity: 0,
         },
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textMuted,
-        tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
+        tabBarLabelStyle: { fontSize: 11, fontWeight: "700", marginBottom: 4 },
         tabBarIcon: ({ focused, color, size }) => {
           const icons: Record<string, [string, string]> = {
-            Home: ['home', 'home-outline'],
-            Tasks: ['checkmark-circle', 'checkmark-circle-outline'],
-            Profile: ['person', 'person-outline'],
+            Home: ["home", "home-outline"],
+            Tasks: ["checkmark-circle", "checkmark-circle-outline"],
+            Profile: ["person", "person-outline"],
           };
-          const [active, inactive] = icons[route.name] ?? ['ellipse', 'ellipse-outline'];
+          const [active, inactive] = icons[route.name] ?? [
+            "ellipse",
+            "ellipse-outline",
+          ];
           return (
-            <Ionicons
-              name={(focused ? active : inactive) as any}
-              size={22}
-              color={color}
-            />
+            <View
+              style={{
+                backgroundColor: focused
+                  ? colors.primary + "15"
+                  : "transparent",
+                padding: 6,
+                borderRadius: 12,
+              }}
+            >
+              <Ionicons
+                name={(focused ? active : inactive) as any}
+                size={22}
+                color={color}
+              />
+            </View>
           );
         },
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} options={{ tabBarLabel: 'হোম' }} />
-      <Tab.Screen name="Tasks" component={TaskNavigator} options={{ tabBarLabel: 'Tasks' }} />
-      <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarLabel: 'প্রোফাইল' }} />
+      <Tab.Screen
+        name="Home"
+        component={HomeScreen}
+        options={{ tabBarLabel: "Home" }}
+      />
+      <Tab.Screen
+        name="Tasks"
+        component={TaskNavigator}
+        options={{ tabBarLabel: "Tasks" }}
+      />
+      <Tab.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{ tabBarLabel: "Profile" }}
+      />
     </Tab.Navigator>
   );
 }

@@ -1,5 +1,4 @@
-// src/screens/tasks/TaskListScreen.tsx
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -7,181 +6,224 @@ import {
   StyleSheet,
   TouchableOpacity,
   RefreshControl,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
-import { useTasks } from '../../hooks/useTasks';
-import { useTaskStore } from '../../store';
-import { TaskCard } from '../../components/tasks/TaskCard';
-import { EmptyState } from '../../components/common';
-import { colors, typography, spacing, radius } from '../../theme';
-import type { TaskStatus } from '../../types';
+  ScrollView,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
+import { LinearGradient } from "expo-linear-gradient";
+import Animated, { FadeInDown, Layout } from "react-native-reanimated";
 
-const STATUS_TABS: { key: TaskStatus | 'all'; label: string }[] = [
-  { key: 'all', label: 'সব' },
-  { key: 'todo', label: 'To Do' },
-  { key: 'in-progress', label: 'চলমান' },
-  { key: 'done', label: 'শেষ' },
+import { useTasks } from "../../hooks/useTasks";
+import { useTaskStore } from "../../store";
+import { TaskCard } from "../../components/tasks/TaskCard";
+import { EmptyState } from "../../components/common";
+import { colors, typography, spacing, radius } from "../../theme";
+import type { TaskStatus } from "../../types";
+
+const STATUS_TABS: { key: TaskStatus | "all"; label: string }[] = [
+  { key: "all", label: "All" },
+  { key: "todo", label: "To Do" },
+  { key: "in-progress", label: "Going" },
+  { key: "done", label: "End" },
 ];
 
 export function TaskListScreen({ navigation }: any) {
   const { tasks, isLoading, update, remove } = useTasks();
-  const { setFilter, filter } = useTaskStore();
-  const [activeTab, setActiveTab] = useState<TaskStatus | 'all'>('all');
+  const { setFilter, filter, getFilteredTasks } = useTaskStore();
+  const [activeTab, setActiveTab] = useState<TaskStatus | "all">("all");
 
-  const handleTabChange = (tab: TaskStatus | 'all') => {
+  const filteredTasks = getFilteredTasks();
+
+  const handleTabChange = (tab: TaskStatus | "all") => {
     setActiveTab(tab);
-    setFilter(tab === 'all' ? {} : { status: tab });
-  };
-
-  const toggleStatus = (task: any) => {
-    const next =
-      task.status === 'todo'
-        ? 'in-progress'
-        : task.status === 'in-progress'
-        ? 'done'
-        : 'todo';
-    update(task.id, { status: next });
+    setFilter(tab === "all" ? {} : { status: tab });
   };
 
   const stats = {
     total: tasks.length,
-    done: tasks.filter((t) => t.status === 'done').length,
-    inProgress: tasks.filter((t) => t.status === 'in-progress').length,
+    done: tasks.filter((t) => t.status === "done").length,
+    inProgress: tasks.filter((t) => t.status === "in-progress").length,
   };
 
   return (
-    <SafeAreaView style={styles.safe}>
-      {/* Header */}
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.headerTitle}>My Tasks</Text>
-          <Text style={styles.headerSub}>
-            {stats.total}টি task · {stats.done}টি সম্পন্ন
-          </Text>
-        </View>
-        <TouchableOpacity
-          style={styles.addBtn}
-          onPress={() => navigation.navigate('AddTask')}
-        >
-          <Ionicons name="add" size={24} color="#fff" />
-        </TouchableOpacity>
-      </View>
-
-      {/* Stats row */}
-      <View style={styles.statsRow}>
-        <View style={styles.statBox}>
-          <Text style={styles.statNum}>{stats.total}</Text>
-          <Text style={styles.statLabel}>মোট</Text>
-        </View>
-        <View style={[styles.statBox, styles.statDivider]}>
-          <Text style={[styles.statNum, { color: colors.warning }]}>
-            {stats.inProgress}
-          </Text>
-          <Text style={styles.statLabel}>চলমান</Text>
-        </View>
-        <View style={styles.statBox}>
-          <Text style={[styles.statNum, { color: colors.success }]}>
-            {stats.done}
-          </Text>
-          <Text style={styles.statLabel}>সম্পন্ন</Text>
-        </View>
-      </View>
-
-      {/* Filter Tabs */}
-      <View style={styles.tabs}>
-        {STATUS_TABS.map((tab) => (
-          <TouchableOpacity
-            key={tab.key}
-            onPress={() => handleTabChange(tab.key)}
-            style={[styles.tab, activeTab === tab.key && styles.tabActive]}
-          >
-            <Text
-              style={[
-                styles.tabText,
-                activeTab === tab.key && styles.tabTextActive,
-              ]}
-            >
-              {tab.label}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      {/* Task List */}
-      <FlatList
-        data={tasks}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <TaskCard
-            task={item}
-            onPress={() => navigation.navigate('TaskDetail', { taskId: item.id })}
-            onEdit={() => navigation.navigate('EditTask', { taskId: item.id })}
-            onDelete={() => remove(item.id)}
-            onToggleStatus={() => toggleStatus(item)}
-          />
-        )}
-        contentContainerStyle={styles.list}
-        ListEmptyComponent={
-          <EmptyState
-            icon="📋"
-            title="কোনো task নেই"
-            subtitle="নতুন task যোগ করুন"
-          />
-        }
-        refreshControl={
-          <RefreshControl
-            refreshing={isLoading}
-            tintColor={colors.primary}
-            colors={[colors.primary]}
-          />
-        }
-        showsVerticalScrollIndicator={false}
+    <View style={styles.container}>
+      <LinearGradient
+        colors={colors.gradientDark as any}
+        style={StyleSheet.absoluteFill}
       />
-    </SafeAreaView>
+
+      <SafeAreaView style={styles.safe}>
+        {/* Header */}
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.headerTitle}>My Tasks</Text>
+            <Text style={styles.headerSub}>
+              {stats.total} tasks · {stats.done} completed
+            </Text>
+          </View>
+          <TouchableOpacity
+            style={styles.addBtnContainer}
+            onPress={() => navigation.navigate("AddTask")}
+          >
+            <LinearGradient
+              colors={colors.gradientPrimary as any}
+              style={styles.addBtn}
+            >
+              <Ionicons name="add" size={26} color="#fff" />
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
+
+        {/* Stats Row (Glass) */}
+        <Animated.View
+          entering={FadeInDown.delay(100)}
+          style={styles.statsContainer}
+        >
+          <BlurView intensity={20} tint="dark" style={styles.statsRow}>
+            <View style={styles.statBox}>
+              <Text style={styles.statNum}>{stats.total}</Text>
+              <Text style={styles.statLabel}>Total</Text>
+            </View>
+            <View style={[styles.statBox, styles.statDivider]}>
+              <Text style={[styles.statNum, { color: colors.warning }]}>
+                {stats.inProgress}
+              </Text>
+              <Text style={styles.statLabel}>Active</Text>
+            </View>
+            <View style={styles.statBox}>
+              <Text style={[styles.statNum, { color: colors.success }]}>
+                {stats.done}
+              </Text>
+              <Text style={styles.statLabel}>Done</Text>
+            </View>
+          </BlurView>
+        </Animated.View>
+
+        {/* Tabs */}
+        <View style={styles.tabsContainer}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.tabs}
+          >
+            {STATUS_TABS.map((tab) => {
+              const isActive = activeTab === tab.key;
+              return (
+                <TouchableOpacity
+                  key={tab.key}
+                  onPress={() => handleTabChange(tab.key)}
+                  activeOpacity={0.8}
+                  style={styles.tabWrapper}
+                >
+                  {isActive ? (
+                    <LinearGradient
+                      colors={colors.gradientPrimary as any}
+                      style={styles.tabActive}
+                    >
+                      <Text style={styles.tabTextActive}>{tab.label}</Text>
+                    </LinearGradient>
+                  ) : (
+                    <BlurView intensity={10} tint="dark" style={styles.tab}>
+                      <Text style={styles.tabText}>{tab.label}</Text>
+                    </BlurView>
+                  )}
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+        </View>
+
+        {/* List */}
+        <FlatList
+          data={filteredTasks}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item, index }) => (
+            <TaskCard
+              task={item}
+              index={index}
+              onPress={() =>
+                navigation.navigate("TaskDetail", { taskId: item.id })
+              }
+              onEdit={() =>
+                navigation.navigate("EditTask", { taskId: item.id })
+              }
+              onDelete={() => remove(item.id)}
+              onToggleStatus={() => {
+                const next =
+                  item.status === "done"
+                    ? "todo"
+                    : item.status === "in-progress"
+                      ? "done"
+                      : "in-progress";
+                update(item.id, { status: next });
+              }}
+            />
+          )}
+          contentContainerStyle={styles.list}
+          ListEmptyComponent={
+            <EmptyState
+              icon="📋"
+              title="কোনো task পাওয়া যায়নি"
+              subtitle="এই ক্যাটাগরিতে কোনো task নেই"
+            />
+          }
+          refreshControl={
+            <RefreshControl refreshing={isLoading} tintColor={colors.primary} />
+          }
+        />
+      </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.bg },
+  container: { flex: 1 },
+  safe: { flex: 1 },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: spacing['2xl'],
-    paddingTop: spacing.base,
-    paddingBottom: spacing.md,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.lg,
   },
   headerTitle: {
-    fontSize: typography['2xl'],
-    fontWeight: '800',
+    fontSize: typography["2xl"],
+    fontWeight: "900",
     color: colors.textPrimary,
     letterSpacing: -0.5,
   },
-  headerSub: { color: colors.textSecondary, fontSize: typography.sm, marginTop: 2 },
+  headerSub: {
+    color: colors.textSecondary,
+    fontSize: typography.sm,
+    fontWeight: "500",
+  },
+  addBtnContainer: {
+    borderRadius: radius.lg,
+    overflow: "hidden",
+    elevation: 4,
+  },
   addBtn: {
     width: 44,
     height: 44,
-    borderRadius: radius.lg,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
 
-  statsRow: {
-    flexDirection: 'row',
-    marginHorizontal: spacing['2xl'],
-    backgroundColor: colors.bgCard,
+  statsContainer: {
+    marginHorizontal: spacing.xl,
+    marginBottom: spacing.lg,
     borderRadius: radius.xl,
+    overflow: "hidden",
     borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: spacing.base,
+    borderColor: colors.bgGlassBorder,
   },
-  statBox: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: spacing.base,
+  statsRow: {
+    flexDirection: "row",
+    backgroundColor: colors.bgGlass,
+    paddingVertical: spacing.md,
   },
+  statBox: { flex: 1, alignItems: "center" },
   statDivider: {
     borderLeftWidth: 1,
     borderRightWidth: 1,
@@ -189,34 +231,36 @@ const styles = StyleSheet.create({
   },
   statNum: {
     fontSize: typography.xl,
-    fontWeight: '800',
+    fontWeight: "900",
     color: colors.textPrimary,
   },
-  statLabel: { color: colors.textMuted, fontSize: typography.xs, marginTop: 2 },
+  statLabel: {
+    color: colors.textMuted,
+    fontSize: typography.xs,
+    fontWeight: "600",
+    marginTop: 2,
+  },
 
-  tabs: {
-    flexDirection: 'row',
-    paddingHorizontal: spacing['2xl'],
-    gap: spacing.sm,
-    marginBottom: spacing.base,
+  tabsContainer: { marginBottom: spacing.lg },
+  tabs: { paddingHorizontal: spacing.xl, gap: spacing.sm },
+  tabWrapper: {
+    borderRadius: radius.full,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: colors.bgGlassBorder,
   },
   tab: {
-    paddingHorizontal: spacing.base,
-    paddingVertical: 7,
-    borderRadius: radius.full,
-    backgroundColor: colors.bgCard,
-    borderWidth: 1,
-    borderColor: colors.border,
+    paddingHorizontal: spacing.xl,
+    paddingVertical: 8,
+    backgroundColor: colors.bgGlass,
   },
-  tabActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
+  tabActive: { paddingHorizontal: spacing.xl, paddingVertical: 8 },
+  tabText: {
+    color: colors.textSecondary,
+    fontSize: typography.sm,
+    fontWeight: "600",
   },
-  tabText: { color: colors.textSecondary, fontSize: typography.sm, fontWeight: '500' },
-  tabTextActive: { color: '#fff' },
+  tabTextActive: { color: "#fff", fontSize: typography.sm, fontWeight: "700" },
 
-  list: {
-    paddingHorizontal: spacing['2xl'],
-    paddingBottom: 100,
-  },
+  list: { paddingHorizontal: spacing.xl, paddingBottom: 100 },
 });

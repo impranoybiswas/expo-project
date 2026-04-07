@@ -1,6 +1,5 @@
-// src/store/index.ts
-import { create } from 'zustand';
-import type { User, Task, TaskFilter } from '../types';
+import { create } from "zustand";
+import type { User, Task, TaskFilter } from "../types";
 
 // ─── Auth Store ───────────────────────────────────────────────
 interface AuthState {
@@ -54,8 +53,10 @@ export const useTaskStore = create<TaskState>((set, get) => ({
   setLoading: (isLoading) => set({ isLoading }),
   setError: (error) => set({ error }),
 
+  // Helper for components
   getFilteredTasks: () => {
     const { tasks, filter } = get();
+    if (!filter) return tasks;
     return tasks.filter((t) => {
       if (filter.status && t.status !== filter.status) return false;
       if (filter.priority && t.priority !== filter.priority) return false;

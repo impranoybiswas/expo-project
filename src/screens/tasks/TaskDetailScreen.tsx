@@ -1,18 +1,34 @@
-// src/screens/tasks/TaskDetailScreen.tsx
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
-  View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
-import { getTask } from '../../services/taskService';
-import { useTasks } from '../../hooks/useTasks';
-import { Badge } from '../../components/common';
-import { colors, typography, spacing, radius } from '../../theme';
-import type { Task } from '../../types';
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
+import { LinearGradient } from "expo-linear-gradient";
+import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 
-const PRIORITY_COLORS = { low: colors.priorityLow, medium: colors.priorityMedium, high: colors.priorityHigh };
-const STATUS_COLORS = { todo: colors.textMuted, 'in-progress': colors.warning, done: colors.success };
+import { getTask } from "../../services/taskService";
+import { useTasks } from "../../hooks/useTasks";
+import { Badge } from "../../components/common";
+import { colors, typography, spacing, radius } from "../../theme";
+import type { Task } from "../../types";
+
+const PRIORITY_COLORS = {
+  low: colors.priorityLow,
+  medium: colors.priorityMedium,
+  high: colors.priorityHigh,
+};
+const STATUS_COLORS = {
+  todo: colors.textMuted,
+  "in-progress": colors.warning,
+  done: colors.success,
+};
 
 export function TaskDetailScreen({ navigation, route }: any) {
   const { taskId } = route.params;
@@ -24,107 +40,341 @@ export function TaskDetailScreen({ navigation, route }: any) {
   }, [taskId]);
 
   const handleDelete = () => {
-    Alert.alert('Delete', 'এই task delete করবেন?', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Delete', style: 'destructive', onPress: async () => { await remove(taskId); navigation.goBack(); } },
-    ]);
+    Alert.alert(
+      "Delete Task",
+      "Are you sure you want to permanently delete this task?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            await remove(taskId);
+            navigation.goBack();
+          },
+        },
+      ],
+    );
   };
 
-  if (!task) return (
-    <SafeAreaView style={[styles.safe, { justifyContent: 'center', alignItems: 'center' }]}>
-      <Text style={{ color: colors.textSecondary }}>Loading...</Text>
-    </SafeAreaView>
-  );
+  if (!task)
+    return (
+      <View style={styles.container}>
+        <LinearGradient
+          colors={colors.gradientDark as any}
+          style={StyleSheet.absoluteFill}
+        />
+        <SafeAreaView
+          style={[
+            styles.safe,
+            { justifyContent: "center", alignItems: "center" },
+          ]}
+        >
+          <Text style={{ color: colors.textSecondary }}>Loading...</Text>
+        </SafeAreaView>
+      </View>
+    );
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Ionicons name="arrow-back" size={20} color={colors.textPrimary} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Task Details</Text>
-        <View style={styles.headerActions}>
-          <TouchableOpacity onPress={() => navigation.navigate('EditTask', { taskId })} style={styles.iconBtn}>
-            <Ionicons name="pencil-outline" size={18} color={colors.textSecondary} />
+    <View style={styles.container}>
+      <LinearGradient
+        colors={colors.gradientDark as any}
+        style={StyleSheet.absoluteFill}
+      />
+
+      <SafeAreaView style={styles.safe}>
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.backBtnContainer}
+          >
+            <BlurView intensity={20} tint="dark" style={styles.backBtn}>
+              <Ionicons
+                name="arrow-back"
+                size={20}
+                color={colors.textPrimary}
+              />
+            </BlurView>
           </TouchableOpacity>
-          <TouchableOpacity onPress={handleDelete} style={styles.iconBtn}>
-            <Ionicons name="trash-outline" size={18} color={colors.error} />
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <ScrollView contentContainerStyle={styles.content}>
-        <View style={[styles.accentBar, { backgroundColor: PRIORITY_COLORS[task.priority] }]} />
-
-        <Text style={styles.title}>{task.title}</Text>
-
-        <View style={styles.badgeRow}>
-          <Badge label={task.priority} color={PRIORITY_COLORS[task.priority]} bgColor={PRIORITY_COLORS[task.priority]} />
-          <Badge label={task.status} color={STATUS_COLORS[task.status]} bgColor={STATUS_COLORS[task.status]} />
-          <Badge label={task.category} color={colors.accent} bgColor={colors.accent} />
-        </View>
-
-        {task.description ? (
-          <View style={styles.section}>
-            <Text style={styles.sectionLabel}>বিবরণ</Text>
-            <Text style={styles.description}>{task.description}</Text>
-          </View>
-        ) : null}
-
-        <View style={styles.metaCard}>
-          {[
-            { icon: 'calendar-outline', label: 'তৈরি', value: new Date(task.createdAt).toLocaleDateString('bn-BD') },
-            { icon: 'time-outline', label: 'আপডেট', value: new Date(task.updatedAt).toLocaleDateString('bn-BD') },
-          ].map((m) => (
-            <View key={m.label} style={styles.metaRow}>
-              <Ionicons name={m.icon as any} size={16} color={colors.textMuted} />
-              <Text style={styles.metaLabel}>{m.label}</Text>
-              <Text style={styles.metaValue}>{m.value}</Text>
-            </View>
-          ))}
-        </View>
-
-        {/* Quick status update */}
-        <Text style={styles.sectionLabel}>Status পরিবর্তন করুন</Text>
-        <View style={styles.statusRow}>
-          {(['todo', 'in-progress', 'done'] as const).map((s) => (
+          <Text style={styles.headerTitle}>Task Details</Text>
+          <View style={styles.headerActions}>
             <TouchableOpacity
-              key={s}
-              onPress={() => { update(taskId, { status: s }); setTask((prev) => prev ? { ...prev, status: s } : prev); }}
-              style={[styles.statusBtn, task.status === s && { backgroundColor: STATUS_COLORS[s] + '22', borderColor: STATUS_COLORS[s] }]}
+              onPress={() => navigation.navigate("EditTask", { taskId })}
+              style={styles.actionBtn}
             >
-              <Text style={[styles.statusBtnText, task.status === s && { color: STATUS_COLORS[s] }]}>{s}</Text>
+              <BlurView intensity={20} tint="dark" style={styles.actionIcon}>
+                <Ionicons name="pencil" size={18} color={colors.accent} />
+              </BlurView>
             </TouchableOpacity>
-          ))}
+            <TouchableOpacity onPress={handleDelete} style={styles.actionBtn}>
+              <BlurView intensity={20} tint="dark" style={styles.actionIcon}>
+                <Ionicons name="trash" size={18} color={colors.error} />
+              </BlurView>
+            </TouchableOpacity>
+          </View>
         </View>
-      </ScrollView>
-    </SafeAreaView>
+
+        <ScrollView
+          contentContainerStyle={styles.scroll}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Main Card */}
+          <Animated.View
+            entering={FadeInDown.duration(600)}
+            style={styles.mainCardContainer}
+          >
+            <BlurView intensity={20} tint="dark" style={styles.mainCard}>
+              <View
+                style={[
+                  styles.priorityTag,
+                  { backgroundColor: PRIORITY_COLORS[task.priority] },
+                ]}
+              />
+
+              <Text style={styles.title}>{task.title}</Text>
+
+              <View style={styles.badgeRow}>
+                <Badge
+                  label={task.priority}
+                  color={PRIORITY_COLORS[task.priority]}
+                  bgColor={PRIORITY_COLORS[task.priority] + "22"}
+                />
+                <Badge
+                  label={task.status}
+                  color={STATUS_COLORS[task.status]}
+                  bgColor={STATUS_COLORS[task.status] + "22"}
+                />
+                <Badge
+                  label={task.category}
+                  color={colors.accent}
+                  bgColor={colors.accent + "22"}
+                />
+              </View>
+
+              {task.description ? (
+                <View style={styles.descriptionSection}>
+                  <Text style={styles.sectionLabel}>Description</Text>
+                  <Text style={styles.descriptionText}>{task.description}</Text>
+                </View>
+              ) : null}
+            </BlurView>
+          </Animated.View>
+
+          {/* Meta Information */}
+          <Animated.View
+            entering={FadeInUp.delay(200).duration(800)}
+            style={styles.metaCardContainer}
+          >
+            <BlurView intensity={15} tint="dark" style={styles.metaCard}>
+              <View style={styles.metaRow}>
+                <Ionicons
+                  name="calendar-outline"
+                  size={18}
+                  color={colors.textSecondary}
+                />
+                <Text style={styles.metaLabel}>Created At</Text>
+                <Text style={styles.metaValue}>
+                  {new Date(task.createdAt).toLocaleDateString()}
+                </Text>
+              </View>
+              <View style={styles.metaDivider} />
+              <View style={styles.metaRow}>
+                <Ionicons
+                  name="time-outline"
+                  size={18}
+                  color={colors.textSecondary}
+                />
+                <Text style={styles.metaLabel}>Last Updated</Text>
+                <Text style={styles.metaValue}>
+                  {new Date(task.updatedAt).toLocaleDateString()}
+                </Text>
+              </View>
+            </BlurView>
+          </Animated.View>
+
+          {/* Quick Status Toggles */}
+          <Animated.View
+            entering={FadeInUp.delay(400)}
+            style={styles.statusSection}
+          >
+            <Text style={styles.sectionLabel}>Change Status</Text>
+            <View style={styles.statusGrid}>
+              {(["todo", "in-progress", "done"] as const).map((s) => {
+                const isActive = task.status === s;
+                return (
+                  <TouchableOpacity
+                    key={s}
+                    onPress={() => {
+                      update(taskId, { status: s });
+                      setTask((t) => (t ? { ...t, status: s } : t));
+                    }}
+                    activeOpacity={0.8}
+                    style={[
+                      styles.statusToggle,
+                      isActive && { borderColor: STATUS_COLORS[s] },
+                    ]}
+                  >
+                    <BlurView
+                      intensity={isActive ? 40 : 10}
+                      tint="dark"
+                      style={styles.statusBlur}
+                    >
+                      <Text
+                        style={[
+                          styles.statusText,
+                          isActive && {
+                            color: STATUS_COLORS[s],
+                            fontWeight: "700",
+                          },
+                        ]}
+                      >
+                        {s.toUpperCase()}
+                      </Text>
+                    </BlurView>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </Animated.View>
+        </ScrollView>
+      </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.bg },
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing['2xl'], paddingVertical: spacing.base },
-  backBtn: { width: 36, height: 36, borderRadius: radius.md, backgroundColor: colors.bgCard, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { fontSize: typography.lg, fontWeight: '700', color: colors.textPrimary },
-  headerActions: { flexDirection: 'row', gap: spacing.sm },
-  iconBtn: { width: 36, height: 36, borderRadius: radius.md, backgroundColor: colors.bgCard, alignItems: 'center', justifyContent: 'center' },
+  container: { flex: 1 },
+  safe: { flex: 1 },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.lg,
+  },
+  backBtnContainer: {
+    borderRadius: radius.lg,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: colors.bgGlassBorder,
+  },
+  backBtn: {
+    width: 40,
+    height: 40,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.bgGlass,
+  },
+  headerTitle: {
+    fontSize: typography.lg,
+    fontWeight: "800",
+    color: colors.textPrimary,
+  },
+  headerActions: { flexDirection: "row", gap: spacing.sm },
+  actionBtn: {
+    borderRadius: radius.lg,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: colors.bgGlassBorder,
+  },
+  actionIcon: {
+    width: 40,
+    height: 40,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.bgGlass,
+  },
 
-  content: { padding: spacing['2xl'], gap: spacing.base, paddingBottom: 60 },
-  accentBar: { height: 4, borderRadius: 2, marginBottom: spacing.base },
-  title: { fontSize: typography.xl, fontWeight: '800', color: colors.textPrimary, letterSpacing: -0.5 },
-  badgeRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  scroll: { padding: spacing.xl, gap: spacing.lg, paddingBottom: 60 },
+  mainCardContainer: {
+    borderRadius: radius["3xl"],
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: colors.bgGlassBorder,
+  },
+  mainCard: { padding: spacing["2xl"], backgroundColor: colors.bgGlass },
+  priorityTag: {
+    height: 6,
+    width: 60,
+    borderRadius: 3,
+    marginBottom: spacing.lg,
+  },
+  title: {
+    fontSize: typography["2xl"],
+    fontWeight: "900",
+    color: colors.textPrimary,
+    marginBottom: spacing.md,
+  },
+  badgeRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: spacing.sm,
+    marginBottom: spacing.xl,
+  },
+  descriptionSection: {
+    marginTop: spacing.md,
+    paddingTop: spacing.xl,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+  },
+  sectionLabel: {
+    color: colors.textSecondary,
+    fontSize: typography.sm,
+    fontWeight: "700",
+    marginBottom: spacing.base,
+    textTransform: "uppercase",
+  },
+  descriptionText: {
+    color: colors.textPrimary,
+    fontSize: typography.base,
+    lineHeight: 26,
+  },
 
-  section: { backgroundColor: colors.bgCard, borderRadius: radius.xl, padding: spacing.base, borderWidth: 1, borderColor: colors.border },
-  sectionLabel: { color: colors.textSecondary, fontSize: typography.sm, fontWeight: '600', marginBottom: spacing.sm, letterSpacing: 0.3 },
-  description: { color: colors.textPrimary, fontSize: typography.base, lineHeight: 24 },
+  metaCardContainer: {
+    borderRadius: radius["2xl"],
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: colors.bgGlassBorder,
+  },
+  metaCard: {
+    padding: spacing.xl,
+    backgroundColor: colors.bgGlass,
+    gap: spacing.md,
+  },
+  metaRow: { flexDirection: "row", alignItems: "center", gap: spacing.md },
+  metaLabel: {
+    flex: 1,
+    color: colors.textSecondary,
+    fontSize: typography.sm,
+    fontWeight: "500",
+  },
+  metaValue: {
+    color: colors.textPrimary,
+    fontSize: typography.sm,
+    fontWeight: "700",
+  },
+  metaDivider: { height: 1, backgroundColor: colors.border },
 
-  metaCard: { backgroundColor: colors.bgCard, borderRadius: radius.xl, padding: spacing.base, borderWidth: 1, borderColor: colors.border, gap: spacing.sm },
-  metaRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  metaLabel: { flex: 1, color: colors.textSecondary, fontSize: typography.sm },
-  metaValue: { color: colors.textPrimary, fontSize: typography.sm, fontWeight: '600' },
-
-  statusRow: { flexDirection: 'row', gap: spacing.sm },
-  statusBtn: { flex: 1, paddingVertical: 10, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.bgCard, alignItems: 'center' },
-  statusBtnText: { color: colors.textSecondary, fontSize: typography.sm, fontWeight: '600' },
+  statusSection: { marginTop: spacing.md },
+  statusGrid: { flexDirection: "row", gap: spacing.sm },
+  statusToggle: {
+    flex: 1,
+    borderRadius: radius.xl,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: colors.bgGlassBorder,
+  },
+  statusBlur: {
+    paddingVertical: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.bgGlass,
+  },
+  statusText: {
+    fontSize: 10,
+    color: colors.textSecondary,
+    fontWeight: "600",
+    letterSpacing: 1,
+  },
 });

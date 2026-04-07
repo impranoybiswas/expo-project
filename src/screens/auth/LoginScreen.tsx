@@ -1,5 +1,4 @@
-// src/screens/auth/LoginScreen.tsx
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -8,160 +7,205 @@ import {
   KeyboardAvoidingView,
   Platform,
   TouchableOpacity,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useAuthStore } from '../../store';
-import { login } from '../../services/authService';
-import { Button, Input } from '../../components/common';
-import { colors, typography, spacing, radius } from '../../theme';
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { BlurView } from "expo-blur";
+import { LinearGradient } from "expo-linear-gradient";
+import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
+
+import { useAuthStore } from "../../store";
+import { login } from "../../services/authService";
+import { Button, Input } from "../../components/common";
+import { colors, typography, spacing, radius } from "../../theme";
 
 export function LoginScreen({ navigation }: any) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const { setUser } = useAuthStore();
 
   const handleLogin = async () => {
     if (!email || !password) {
-      setError('সব field পূরণ করুন');
+      setError("Please fill all fields");
       return;
     }
     setLoading(true);
-    setError('');
+    setError("");
     try {
       const user = await login(email.trim(), password);
       setUser(user);
     } catch (err: any) {
-      setError('Email বা password ভুল');
+      setError("Invalid email or password");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={{ flex: 1 }}
-      >
-        <ScrollView
-          contentContainerStyle={styles.container}
-          keyboardShouldPersistTaps="handled"
+    <View style={styles.container}>
+      <LinearGradient
+        colors={colors.gradientDark as any}
+        style={StyleSheet.absoluteFill}
+      />
+
+      <SafeAreaView style={styles.safe}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          style={{ flex: 1 }}
         >
-          {/* Logo / Header */}
-          <View style={styles.header}>
-            <View style={styles.logoBox}>
-              <Text style={styles.logoIcon}>✦</Text>
-            </View>
-            <Text style={styles.appName}>TaskFlow</Text>
-            <Text style={styles.tagline}>আপনার কাজ, আপনার নিয়ন্ত্রণে</Text>
-          </View>
+          <ScrollView
+            contentContainerStyle={styles.scroll}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Logo / Header */}
+            <Animated.View
+              entering={FadeInDown.duration(800)}
+              style={styles.header}
+            >
+              <LinearGradient
+                colors={colors.gradientPrimary as any}
+                style={styles.logoBox}
+              >
+                <Text style={styles.logoIcon}>✦</Text>
+              </LinearGradient>
+              <Text style={styles.appName}>TaskFlow</Text>
+              <Text style={styles.tagline}>Your Flow, Your Control</Text>
+            </Animated.View>
 
-          {/* Form Card */}
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>স্বাগতম 👋</Text>
-            <Text style={styles.cardSubtitle}>Login করুন continue করতে</Text>
+            {/* Form Card */}
+            <Animated.View
+              entering={FadeInUp.delay(300).duration(800)}
+              style={styles.cardContainer}
+            >
+              <BlurView intensity={20} tint="dark" style={styles.card}>
+                <Text style={styles.cardTitle}>Welcome back 👋</Text>
+                <Text style={styles.cardSubtitle}>Login to continue</Text>
 
-            <Input
-              label="Email"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              placeholder="your@email.com"
-              containerStyle={{ marginTop: spacing.lg }}
-            />
-            <Input
-              label="Password"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              placeholder="••••••••"
-            />
+                <Input
+                  label="Email"
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  placeholder="your@email.com"
+                  containerStyle={{ marginTop: spacing.xl }}
+                />
+                <Input
+                  label="Password"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry
+                  placeholder="••••••••"
+                />
 
-            {error ? <Text style={styles.error}>{error}</Text> : null}
+                {error ? <Text style={styles.error}>{error}</Text> : null}
 
-            <Button
-              label="Login"
-              onPress={handleLogin}
-              loading={loading}
-              style={{ marginTop: spacing.base }}
-            />
-          </View>
+                <Button
+                  label="Login"
+                  onPress={handleLogin}
+                  loading={loading}
+                  style={{ marginTop: spacing.lg }}
+                />
+              </BlurView>
+            </Animated.View>
 
-          {/* Register link */}
-          <View style={styles.registerRow}>
-            <Text style={styles.registerText}>Account নেই? </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-              <Text style={styles.registerLink}>Register করুন</Text>
-            </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+            {/* Register link */}
+            <Animated.View
+              entering={FadeInUp.delay(600)}
+              style={styles.registerRow}
+            >
+              <Text style={styles.registerText}>Don't have an account? </Text>
+              <TouchableOpacity onPress={() => navigation.navigate("Register")}>
+                <Text style={styles.registerLink}>Register now</Text>
+              </TouchableOpacity>
+            </Animated.View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.bg },
-  container: {
+  container: { flex: 1 },
+  safe: { flex: 1 },
+  scroll: {
     flexGrow: 1,
-    justifyContent: 'center',
-    padding: spacing['2xl'],
-    gap: spacing.xl,
+    justifyContent: "center",
+    padding: spacing["2xl"],
+    gap: spacing["2xl"],
   },
-  header: { alignItems: 'center', gap: spacing.sm },
+  header: { alignItems: "center", gap: spacing.sm },
   logoBox: {
-    width: 64,
-    height: 64,
-    borderRadius: radius.xl,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
+    width: 72,
+    height: 72,
+    borderRadius: radius["2xl"],
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: spacing.sm,
+    elevation: 10,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
   },
-  logoIcon: { fontSize: 28, color: '#fff' },
+  logoIcon: { fontSize: 32, color: "#fff" },
   appName: {
-    fontSize: typography['2xl'],
-    fontWeight: '800',
+    fontSize: typography["3xl"],
+    fontWeight: "900",
     color: colors.textPrimary,
-    letterSpacing: -0.5,
+    letterSpacing: -1,
   },
-  tagline: { color: colors.textMuted, fontSize: typography.sm },
+  tagline: {
+    color: colors.textSecondary,
+    fontSize: typography.sm,
+    fontWeight: "500",
+  },
 
-  card: {
-    backgroundColor: colors.bgCard,
-    borderRadius: radius.xl,
+  cardContainer: {
+    borderRadius: radius["3xl"],
+    overflow: "hidden",
     borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing.xl,
+    borderColor: colors.bgGlassBorder,
+  },
+  card: {
+    backgroundColor: colors.bgGlass,
+    padding: spacing["2xl"],
   },
   cardTitle: {
-    fontSize: typography.xl,
-    fontWeight: '700',
+    fontSize: typography["2xl"],
+    fontWeight: "800",
     color: colors.textPrimary,
   },
   cardSubtitle: {
     color: colors.textSecondary,
     fontSize: typography.sm,
-    marginTop: 4,
+    marginTop: 6,
+    fontWeight: "500",
   },
   error: {
     color: colors.error,
     fontSize: typography.sm,
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: spacing.sm,
+    fontWeight: "600",
   },
 
   registerRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 10,
   },
-  registerText: { color: colors.textSecondary, fontSize: typography.sm },
+  registerText: {
+    color: colors.textSecondary,
+    fontSize: typography.sm,
+    fontWeight: "500",
+  },
   registerLink: {
     color: colors.accent,
     fontSize: typography.sm,
-    fontWeight: '600',
+    fontWeight: "700",
   },
 });

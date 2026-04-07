@@ -1,27 +1,31 @@
-// src/screens/ProfileScreen.tsx
-import React from 'react';
+import React from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   Alert,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
-import { useAuthStore } from '../store';
-import { logout } from '../services/authService';
-import { colors, typography, spacing, radius } from '../theme';
+  ScrollView,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
+import { LinearGradient } from "expo-linear-gradient";
+import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
+
+import { useAuthStore } from "../store";
+import { logout } from "../services/authService";
+import { colors, typography, spacing, radius } from "../theme";
 
 export function ProfileScreen() {
   const { user, setUser } = useAuthStore();
 
   const handleLogout = () => {
-    Alert.alert('Logout', 'Logout করবেন?', [
-      { text: 'Cancel', style: 'cancel' },
+    Alert.alert("Logout", "Are you sure you want to logout?", [
+      { text: "Cancel", style: "cancel" },
       {
-        text: 'Logout',
-        style: 'destructive',
+        text: "Logout",
+        style: "destructive",
         onPress: async () => {
           await logout();
           setUser(null);
@@ -31,128 +35,234 @@ export function ProfileScreen() {
   };
 
   const menuItems = [
-    { icon: 'person-outline', label: 'Edit Profile', onPress: () => {} },
-    { icon: 'notifications-outline', label: 'Notifications', onPress: () => {} },
-    { icon: 'shield-outline', label: 'Privacy', onPress: () => {} },
-    { icon: 'help-circle-outline', label: 'Help & Support', onPress: () => {} },
+    { icon: "person-outline", label: "Edit Profile", color: colors.primary },
+    {
+      icon: "notifications-outline",
+      label: "Notifications",
+      color: colors.accent,
+    },
+    {
+      icon: "shield-checkmark-outline",
+      label: "Security",
+      color: colors.success,
+    },
+    {
+      icon: "color-palette-outline",
+      label: "Appearance",
+      color: colors.warning,
+    },
+    {
+      icon: "help-circle-outline",
+      label: "Help & Support",
+      color: colors.info,
+    },
   ];
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <View style={styles.container}>
-        {/* Header */}
-        <Text style={styles.title}>প্রোফাইল</Text>
+    <View style={styles.container}>
+      <LinearGradient
+        colors={colors.gradientDark as any}
+        style={StyleSheet.absoluteFill}
+      />
 
-        {/* Avatar card */}
-        <View style={styles.profileCard}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>
-              {(user?.displayName ?? user?.email ?? 'U')[0].toUpperCase()}
-            </Text>
-          </View>
-          <View>
-            <Text style={styles.name}>{user?.displayName ?? 'User'}</Text>
-            <Text style={styles.email}>{user?.email}</Text>
-          </View>
-        </View>
+      <SafeAreaView style={styles.safe}>
+        <ScrollView
+          contentContainerStyle={styles.scroll}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Header */}
+          <Animated.View entering={FadeInDown.duration(800)}>
+            <Text style={styles.title}>Profile</Text>
+          </Animated.View>
 
-        {/* Menu */}
-        <View style={styles.menu}>
-          {menuItems.map((item, idx) => (
-            <TouchableOpacity
-              key={item.label}
-              style={[
-                styles.menuItem,
-                idx < menuItems.length - 1 && styles.menuItemBorder,
-              ]}
-              onPress={item.onPress}
-            >
-              <View style={styles.menuIcon}>
-                <Ionicons name={item.icon as any} size={18} color={colors.textSecondary} />
+          {/* Profile Card */}
+          <Animated.View
+            entering={FadeInDown.delay(200).duration(800)}
+            style={styles.profileCardContainer}
+          >
+            <BlurView intensity={20} tint="dark" style={styles.profileCard}>
+              <View style={styles.avatarContainer}>
+                <LinearGradient
+                  colors={colors.gradientPrimary as any}
+                  style={styles.avatarGradient}
+                >
+                  <Text style={styles.avatarText}>
+                    {(user?.displayName ?? user?.email ?? "U")[0].toUpperCase()}
+                  </Text>
+                </LinearGradient>
               </View>
-              <Text style={styles.menuLabel}>{item.label}</Text>
-              <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
-            </TouchableOpacity>
-          ))}
-        </View>
+              <View style={styles.infoContainer}>
+                <Text style={styles.nameText}>
+                  {user?.displayName ?? "User"}
+                </Text>
+                <Text style={styles.emailText}>{user?.email}</Text>
+              </View>
+            </BlurView>
+          </Animated.View>
 
-        {/* Logout */}
-        <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
-          <Ionicons name="log-out-outline" size={20} color={colors.error} />
-          <Text style={styles.logoutText}>Logout</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+          {/* Menu Section */}
+          <View style={styles.menuContainer}>
+            {menuItems.map((item, idx) => (
+              <Animated.View
+                key={item.label}
+                entering={FadeInUp.delay(300 + idx * 100)}
+              >
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  style={styles.menuItemWrapper}
+                >
+                  <BlurView intensity={10} tint="dark" style={styles.menuItem}>
+                    <View
+                      style={[
+                        styles.menuIcon,
+                        { backgroundColor: item.color + "22" },
+                      ]}
+                    >
+                      <Ionicons
+                        name={item.icon as any}
+                        size={20}
+                        color={item.color}
+                      />
+                    </View>
+                    <Text style={styles.menuLabel}>{item.label}</Text>
+                    <Ionicons
+                      name="chevron-forward"
+                      size={16}
+                      color={colors.textMuted}
+                    />
+                  </BlurView>
+                </TouchableOpacity>
+              </Animated.View>
+            ))}
+          </View>
+
+          {/* Logout Button */}
+          <Animated.View entering={FadeInUp.delay(900)}>
+            <TouchableOpacity
+              onPress={handleLogout}
+              activeOpacity={0.8}
+              style={styles.logoutWrapper}
+            >
+              <BlurView intensity={20} tint="dark" style={styles.logoutBtn}>
+                <Ionicons
+                  name="log-out-outline"
+                  size={22}
+                  color={colors.error}
+                />
+                <Text style={styles.logoutText}>Logout</Text>
+              </BlurView>
+            </TouchableOpacity>
+          </Animated.View>
+
+          {/* App Version */}
+          <Text style={styles.versionText}>Version 1.0.0 (Expo SDK 54)</Text>
+        </ScrollView>
+      </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.bg },
-  container: { flex: 1, padding: spacing['2xl'] },
+  container: { flex: 1 },
+  safe: { flex: 1 },
+  scroll: { padding: spacing.xl, paddingBottom: 100 },
   title: {
-    fontSize: typography['2xl'],
-    fontWeight: '800',
+    fontSize: typography["3xl"],
+    fontWeight: "900",
     color: colors.textPrimary,
     marginBottom: spacing.xl,
-    letterSpacing: -0.5,
+    letterSpacing: -1,
+  },
+
+  profileCardContainer: {
+    borderRadius: radius["3xl"],
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: colors.bgGlassBorder,
+    marginBottom: spacing.xl,
   },
   profileCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.base,
-    backgroundColor: colors.bgCard,
-    borderRadius: radius.xl,
     padding: spacing.xl,
-    borderWidth: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: colors.bgGlass,
+    gap: spacing.lg,
+  },
+  avatarContainer: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    overflow: "hidden",
+    borderWidth: 2,
     borderColor: colors.border,
-    marginBottom: spacing.xl,
   },
-  avatar: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
+  avatarGradient: { flex: 1, alignItems: "center", justifyContent: "center" },
+  avatarText: { fontSize: typography.xl, fontWeight: "800", color: "#fff" },
+  infoContainer: { flex: 1 },
+  nameText: {
+    fontSize: typography.lg,
+    fontWeight: "800",
+    color: colors.textPrimary,
   },
-  avatarText: { fontSize: typography.xl, fontWeight: '700', color: '#fff' },
-  name: { fontSize: typography.md, fontWeight: '700', color: colors.textPrimary },
-  email: { color: colors.textSecondary, fontSize: typography.sm, marginTop: 2 },
+  emailText: {
+    fontSize: typography.sm,
+    color: colors.textSecondary,
+    marginTop: 4,
+  },
 
-  menu: {
-    backgroundColor: colors.bgCard,
+  menuContainer: { gap: spacing.sm, marginBottom: spacing.xl },
+  menuItemWrapper: {
     borderRadius: radius.xl,
+    overflow: "hidden",
     borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: spacing.xl,
+    borderColor: colors.bgGlassBorder,
   },
   menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
     padding: spacing.base,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: colors.bgGlass,
     gap: spacing.md,
   },
-  menuItemBorder: { borderBottomWidth: 1, borderBottomColor: colors.border },
   menuIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: radius.md,
-    backgroundColor: colors.bgElevated,
-    alignItems: 'center',
-    justifyContent: 'center',
+    width: 40,
+    height: 40,
+    borderRadius: radius.lg,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  menuLabel: { flex: 1, color: colors.textPrimary, fontSize: typography.base },
+  menuLabel: {
+    flex: 1,
+    color: colors.textPrimary,
+    fontSize: typography.base,
+    fontWeight: "600",
+  },
 
-  logoutBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.sm,
-    padding: spacing.base,
+  logoutWrapper: {
     borderRadius: radius.xl,
-    backgroundColor: colors.error + '15',
+    overflow: "hidden",
     borderWidth: 1,
-    borderColor: colors.error + '33',
+    borderColor: colors.error + "44",
   },
-  logoutText: { color: colors.error, fontSize: typography.base, fontWeight: '600' },
+  logoutBtn: {
+    paddingVertical: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.error + "11",
+    gap: spacing.sm,
+  },
+  logoutText: {
+    color: colors.error,
+    fontSize: typography.base,
+    fontWeight: "700",
+  },
+
+  versionText: {
+    textAlign: "center",
+    color: colors.textMuted,
+    fontSize: typography.xs,
+    marginTop: spacing.xl,
+    fontWeight: "500",
+  },
 });
